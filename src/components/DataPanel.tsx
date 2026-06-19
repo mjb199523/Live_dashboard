@@ -1,6 +1,6 @@
 /** Generic panel wrapper with loading/error/refresh states */
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { timeAgo } from '../utils/formatters';
 
 interface DataPanelProps {
@@ -14,6 +14,14 @@ interface DataPanelProps {
 }
 
 export function DataPanel({ title, loading, error, lastUpdated, isDemo, onRefresh, children }: DataPanelProps) {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const interval = setInterval(() => setTick((t) => t + 1), 5000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
+
   return (
     <div className="panel-card">
       <div className="panel-card__header">

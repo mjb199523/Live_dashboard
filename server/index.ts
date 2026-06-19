@@ -5,23 +5,17 @@ import express from 'express';
 import cors from 'cors';
 import { startCronJobs } from './cron.js';
 
-// Source fetchers
 import { fetchEarthquakes } from './sources/usgs.js';
 import { fetchDisasters } from './sources/gdacs.js';
 import { fetchNews } from './sources/rss.js';
 import { fetchFlights } from './sources/opensky.js';
 import { fetchFlightTrack } from './sources/opensky_track.js';
-import { fetchWildfires } from './sources/firms.js';
 
 // Real Data Replacements
-import { fetchPipelines } from './sources/pipelines.js';
 import { fetchConflicts } from './sources/conflicts.js';
 import { fetchMarketComposite } from './sources/markets.js';
 import { fetchCommodities } from './sources/commodities.js';
-import { fetchStorage } from './sources/storage.js';
-import { fetchPorts } from './sources/ports.js';
 
-import { computeCII } from './cii.js';
 import { cache } from './cache.js';
 
 const app = express();
@@ -34,7 +28,7 @@ app.use(express.json());
 app.get('/api/health', (_req, res) => {
   const sources = [
     'usgs_earthquakes', 'gdacs_disasters', 'rss_news',
-    'opensky_flights', 'firms_wildfires', 'cii_scores',
+    'opensky_flights',
   ];
 
   const status: Record<string, object> = {};
@@ -49,7 +43,7 @@ app.get('/api/health', (_req, res) => {
   }
 
   // Other real sources that are queried on-demand or use static data
-  for (const key of ['pipelines', 'conflicts', 'markets', 'storage', 'ports', 'commodities']) {
+  for (const key of ['conflicts', 'markets', 'commodities']) {
     status[key] = { status: 'LIVE', lastUpdated: new Date().toISOString(), ageMinutes: 0, isDemo: false };
   }
 
@@ -105,22 +99,6 @@ app.get('/api/flights/:icao24/track', async (req, res) => {
   }
 });
 
-app.get('/api/wildfires', async (_req, res) => {
-  try {
-    const data = await fetchWildfires();
-    const isDemo = !process.env.FIRMS_MAP_KEY;
-    res.json({ data, meta: { source: 'NASA FIRMS', lastUpdated: cache.getTimestamp('firms_wildfires') || new Date().toISOString(), isDemo, count: data.length } });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch wildfires', data: [] });
-  }
-});
-
-app.get('/api/pipelines', async (_req, res) => {
-  try {
-    const data = await fetchPipelines();
-    res.json({ data, meta: { source: 'Static Geographic Data', lastUpdated: new Date().toISOString(), isDemo: false, count: data.length } });
-  } catch (err) { res.status(500).json({ error: 'Failed to fetch pipelines', data: [] }); }
-});
 
 app.get('/api/conflicts', async (_req, res) => {
   try {
@@ -143,26 +121,6 @@ app.get('/api/commodities', async (_req, res) => {
   } catch (err) { res.status(500).json({ error: 'Failed to fetch commodities', data: [] }); }
 });
 
-app.get('/api/storage', async (_req, res) => {
-  try {
-    const data = await fetchStorage();
-    res.json({ data, meta: { source: 'Static Geographic Data', lastUpdated: new Date().toISOString(), isDemo: false, count: data.length } });
-  } catch (err) { res.status(500).json({ error: 'Failed to fetch storage', data: [] }); }
-});
-
-app.get('/api/ports', async (_req, res) => {
-  try {
-    const data = await fetchPorts();
-    res.json({ data, meta: { source: 'Static Geographic Data', lastUpdated: new Date().toISOString(), isDemo: false, count: data.length } });
-  } catch (err) { res.status(500).json({ error: 'Failed to fetch ports', data: [] }); }
-});
-
-app.get('/api/cii', async (_req, res) => {
-  try {
-    const data = await computeCII();
-    res.json({ data, meta: { source: 'CII Engine', lastUpdated: cache.getTimestamp('cii_scores') || new Date().toISOString(), isDemo: false, count: data.length } });
-  } catch (err) { res.status(500).json({ error: 'Failed to fetch CII scores', data: [] }); }
-});
 
 // ─── Start Server ─────────────────────────────────────────
 app.listen(PORT, () => {

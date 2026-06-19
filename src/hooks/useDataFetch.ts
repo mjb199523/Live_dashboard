@@ -29,10 +29,10 @@ export function useDataFetch<T>(
     const key = cacheKey || url;
 
     // Check cache first
-    const cached = cacheGet<{ data: T; meta: { lastUpdated: string; isDemo: boolean } }>(key);
+    const cached = cacheGet<{ data: T; meta: { isDemo: boolean } }>(key);
     if (cached) {
       setData(cached.data);
-      setLastUpdated(cached.meta.lastUpdated);
+      // Removed setLastUpdated from cache so it doesn't instantly show old time before fetch
       setIsDemo(cached.meta.isDemo);
       setLoading(false);
     }
@@ -44,7 +44,7 @@ export function useDataFetch<T>(
 
       if (mountedRef.current) {
         setData(json.data);
-        setLastUpdated(json.meta?.lastUpdated || new Date().toISOString());
+        setLastUpdated(new Date().toISOString());
         setIsDemo(json.meta?.isDemo || false);
         setError(null);
         setLoading(false);

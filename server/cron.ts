@@ -5,8 +5,6 @@ import { fetchEarthquakes } from './sources/usgs.js';
 import { fetchDisasters } from './sources/gdacs.js';
 import { fetchNews } from './sources/rss.js';
 import { fetchFlights } from './sources/opensky.js';
-import { fetchWildfires } from './sources/firms.js';
-import { computeCII } from './cii.js';
 
 export function startCronJobs() {
   console.log('[CRON] Starting scheduled data refresh jobs...');
@@ -35,17 +33,6 @@ export function startCronJobs() {
     try { await fetchFlights(); } catch (e) { console.error('[CRON] Flight refresh failed:', e); }
   });
 
-  // Wildfires — every 15 minutes
-  cron.schedule('*/15 * * * *', async () => {
-    console.log('[CRON] Refreshing wildfire data...');
-    try { await fetchWildfires(); } catch (e) { console.error('[CRON] Wildfire refresh failed:', e); }
-  });
-
-  // CII — every 15 minutes
-  cron.schedule('*/15 * * * *', async () => {
-    console.log('[CRON] Recomputing CII scores...');
-    try { await computeCII(); } catch (e) { console.error('[CRON] CII computation failed:', e); }
-  });
 
   // Initial warm-up fetch
   console.log('[CRON] Running initial data warm-up...');
@@ -53,11 +40,8 @@ export function startCronJobs() {
     fetchEarthquakes(),
     fetchDisasters(),
     fetchNews(),
-    fetchWildfires(),
   ]).then((results) => {
     const succeeded = results.filter((r) => r.status === 'fulfilled').length;
     console.log(`[CRON] Initial warm-up: ${succeeded}/${results.length} sources loaded`);
   });
-
-  computeCII().catch(e => console.error('[CRON] Initial CII computation failed:', e));
 }
