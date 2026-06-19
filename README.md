@@ -1,6 +1,6 @@
 # Dashboard
 
-**Real-time global intelligence & crisis-monitoring dashboard** — a local-first, browser-based situational awareness tool for tracking geopolitical events, natural disasters, energy infrastructure, and market signals.
+**Real-time global intelligence & crisis-monitoring dashboard** — a local-first, browser-based situational awareness tool for tracking geopolitical events, natural disasters, aviation, and market signals.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-6.0-purple?logo=vite)
@@ -26,22 +26,21 @@ npm run dev
 - **Backend API**: http://localhost:3001
 - **Health check**: http://localhost:3001/api/health
 
-> No required API keys — the dashboard works out of the box with free data sources + demo data fallbacks.
+> No required API keys — the dashboard works out of the box with free and live data sources. Everything runs in 100% real-time.
 
 ---
 
 ## ✨ Features
 
-- 🗺️ **Interactive WebGL Map** — deck.gl + MapLibre GL with 9 toggleable data layers
-- 🔄 **7 Workspace Presets** — Crisis Desk, Supply Chain, Energy Security, News Desk, Markets, Tech Watch, Good News
-- 🌡️ **Country Instability Index (CII)** — Composite 0-100 score for 60 countries with 5 weighted dimensions
+- 🗺️ **Interactive WebGL Map** — deck.gl + MapLibre GL with 4 toggleable data layers
+- 🔄 **8 Workspace Presets** — Crisis Desk, Supply Chain, Energy Security, News Desk, Markets, Tech Watch, Good News, Global Aviation
+- 🌍 **Global Country Filtering** — Zoom into any country to instantly filter all dashboard panels
 - 📰 **Live News Aggregation** — RSS feeds from BBC, Reuters, Al Jazeera, NPR, TechCrunch, and more
-- 🔴 **Real-Time Data** — USGS earthquakes, GDACS disaster alerts, OpenSky flight tracking
-- ⚡ **Energy Infrastructure** — Pipeline status, storage facilities, port/chokepoint data
-- 📊 **Market Composite** — 7-signal gauge combining fear/greed, yields, credit spreads, and more
+- 🔴 **Real-Time Data** — USGS earthquakes, GDACS disaster alerts, OpenSky flight tracking, ReliefWeb conflicts
+- 📊 **Market Composite** — 6-signal gauge combining fear/greed, yields, credit spreads, and commodities via Yahoo Finance
 - 🌙 **Command-Center Dark Theme** — Near-black background with neon green/cyan accents
 - 💾 **Client-Side Caching** — localStorage + TTL to reduce API calls
-- 🔌 **Graceful Fallbacks** — Demo data for premium feeds, "no data" states instead of errors
+- 🔌 **Graceful Fallbacks** — "No data" states instead of errors for resilient operation
 
 ---
 
@@ -49,13 +48,14 @@ npm run dev
 
 | Workspace | Description | Key Layers | Key Panels |
 |-----------|-------------|------------|------------|
-| 🔴 Crisis Desk | Conflict, posture, instability | Conflicts, CII, Flights, Earthquakes | News, Conflicts, Flights, CII |
-| 🚢 Supply Chain Risk | Routes, chokepoints, commodities | Ports, Pipelines, CII | Pipelines, Ports, Fuel Shortages |
-| ⚡ Energy Security | Pipelines, storage, outages | Pipelines, Storage, Ports | Pipelines, Storage, Ticker |
-| 📰 News Desk | Breaking news, advisories | Earthquakes, Disasters, Wildfires | News, Live Feeds |
-| 📊 Markets | Quotes, macro signals | Ports, Pipelines, CII | Markets, Fuel Shortages |
-| 🤖 Tech Watch | AI, chips, cyber, regulation | Flights, Earthquakes | News, Markets |
-| 🌱 Good News | Progress, breakthroughs | Wildfires, Storage | News, Storage |
+| 🔴 Crisis Desk | Conflict, posture, instability | Conflicts, Earthquakes, Disasters, Flights | News, Conflicts, Flights |
+| 🚢 Supply Chain Risk | Routes, chokepoints, commodities | Conflicts | Commodities, News |
+| ⚡ Energy Security | Commodities and energy news | (None) | Commodities |
+| 📰 News Desk | Breaking news, advisories | Earthquakes, Disasters, Conflicts | News, Live Feeds, Conflicts |
+| 📊 Markets | Quotes, macro signals | (None) | Markets, Commodities, News |
+| 🤖 Tech Watch | AI, chips, cyber, regulation | Flights, Earthquakes | News, Live Feeds, Markets |
+| 🌱 Good News | Progress, breakthroughs | Earthquakes | News, Markets |
+| ✈️ Global Aviation | Live aircraft tracking | Flights, Earthquakes, Conflicts | Flights, News |
 
 ---
 
@@ -65,14 +65,10 @@ npm run dev
 |--------|-----|:------------:|:------:|
 | USGS Earthquakes | `earthquake.usgs.gov` | ❌ | ✅ Real |
 | GDACS Disasters | `gdacs.org/gdacsapi` | ❌ | ✅ Real |
+| ReliefWeb Conflicts | `reliefweb.int/updates` | ❌ | ✅ Real |
 | RSS News Feeds | BBC, Reuters, etc. | ❌ | ✅ Real |
 | OpenSky Network | `opensky-network.org` | ⚠️ Optional | ✅ Real |
-| NASA FIRMS Wildfires | `firms.modaps.eosdis.nasa.gov` | ⚠️ Free key | ⚡ Real (with key) |
-| Conflicts & Protests | — | — | 🔶 Demo |
-| Oil & Gas Pipelines | — | — | 🔶 Demo |
-| Markets | — | — | 🔶 Demo |
-| Storage Facilities | — | — | 🔶 Demo |
-| Ports & Chokepoints | — | — | 🔶 Demo |
+| Markets | `yahoo-finance2` | ❌ | ✅ Real |
 
 ---
 
@@ -103,7 +99,7 @@ npm run dev
         ┌───────────┴───────────┐
         │  External Free APIs   │
         │  USGS · GDACS · RSS   │
-        │  OpenSky · NASA FIRMS │
+        │  OpenSky · Yahoo Fin. │
         └───────────────────────┘
 ```
 
@@ -115,11 +111,9 @@ All optional — see [.env.example](.env.example) for full documentation.
 
 | Variable | Feature Unlocked |
 |----------|-----------------|
-| `FIRMS_MAP_KEY` | NASA FIRMS wildfire hotspot data |
 | `OPENSKY_USERNAME` / `PASSWORD` | Higher OpenSky rate limits (1000/day) |
 | `MAPTILER_KEY` | Premium dark map tiles |
 | `NEWSAPI_KEY` | Expanded news headlines |
-| `ALPHA_VANTAGE_KEY` | Real market data |
 | `OLLAMA_URL` | Local LLM news summarization |
 
 ---
@@ -131,9 +125,8 @@ dashboard/
 ├── server/              # Express backend
 │   ├── index.ts         # Server entry
 │   ├── cache.ts         # In-memory TTL cache
-│   ├── cii.ts           # Country Instability Index
 │   ├── cron.ts          # Scheduled refresh jobs
-│   └── sources/         # Data fetchers + mock data
+│   └── sources/         # Data fetchers
 ├── src/                 # React frontend
 │   ├── components/      # UI components
 │   │   ├── panels/      # Data panel components
