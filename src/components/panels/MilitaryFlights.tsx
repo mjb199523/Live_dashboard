@@ -1,6 +1,7 @@
 /** Military Flights list panel */
 
 import { useDataFetch } from '../../hooks/useDataFetch';
+import { useWorkspaceStore } from '../../store/workspace';
 import { DataPanel } from '../DataPanel';
 
 interface Flight {
@@ -16,9 +17,16 @@ interface Flight {
 
 export function MilitaryFlights() {
   const { data, loading, error, lastUpdated, isDemo, refresh } = useDataFetch<Flight[]>('/api/flights', 120000);
+  const selectedCountryName = useWorkspaceStore((s) => s.selectedCountryName);
 
+  let flights = data || [];
+  if (selectedCountryName) {
+    const query = selectedCountryName.toLowerCase();
+    flights = flights.filter((f) => f.originCountry && f.originCountry.toLowerCase().includes(query));
+  }
+  
   // Show first 30 flights
-  const flights = data?.slice(0, 30) || [];
+  flights = flights.slice(0, 30);
 
   return (
     <DataPanel

@@ -448,6 +448,10 @@ a:hover {
   align-content: start;
 }
 
+.panels-container > div {
+  min-width: 0;
+}
+
 /* ─── Panel Card ───────────────────────────────────────── */
 .panel-card {
   background: var(--bg-card);

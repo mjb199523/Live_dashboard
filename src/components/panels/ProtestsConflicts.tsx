@@ -1,6 +1,7 @@
 /** Protests & Conflicts scrollable feed */
 
 import { useDataFetch } from '../../hooks/useDataFetch';
+import { useWorkspaceStore } from '../../store/workspace';
 import { DataPanel } from '../DataPanel';
 import { timeAgo } from '../../utils/formatters';
 
@@ -15,6 +16,16 @@ interface ConflictEvent {
 
 export function ProtestsConflicts() {
   const { data, loading, error, lastUpdated, isDemo, refresh } = useDataFetch<ConflictEvent[]>('/api/conflicts', 300000);
+  const selectedCountryName = useWorkspaceStore((s) => s.selectedCountryName);
+
+  let filteredData = data || [];
+  if (selectedCountryName) {
+    const query = selectedCountryName.toLowerCase();
+    filteredData = filteredData.filter((e) => 
+      e.description.toLowerCase().includes(query) || 
+      e.title.toLowerCase().includes(query)
+    );
+  }
 
   return (
     <DataPanel
@@ -25,8 +36,8 @@ export function ProtestsConflicts() {
       isDemo={isDemo}
       onRefresh={refresh}
     >
-      {data && data.length > 0 ? (
-        data.map((event) => (
+      {filteredData.length > 0 ? (
+        filteredData.map((event) => (
           <div key={event.id} className="event-item">
             <div className={`event-item__icon event-item__icon--${event.type}`}>
               {event.type === 'conflict' ? '⚔️' : '📢'}

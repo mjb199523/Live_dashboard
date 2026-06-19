@@ -11,7 +11,7 @@ import { severityColor } from '../utils/formatters';
 import { MapSearch } from './MapSearch';
 
 interface MapViewProps {
-  onCountryClick: (countryCode: string | null) => void;
+  onCountryClick: (countryCode: string | null, countryName: string | null) => void;
 }
 
 
@@ -223,7 +223,7 @@ export function MapView({ onCountryClick }: MapViewProps) {
     }
   }, [workspace.id]);
 
-  const handleSearchSelect = useCallback((center: [number, number]) => {
+  const handleSearchSelect = useCallback((center: [number, number], id?: string, name?: string) => {
     if (mapRef.current) {
       mapRef.current.flyTo({
         center,
@@ -231,12 +231,18 @@ export function MapView({ onCountryClick }: MapViewProps) {
         duration: 1500,
       });
     }
-  }, []);
+    if (id && name) {
+      onCountryClick(id, name);
+    }
+  }, [onCountryClick]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
-      <MapSearch onSelect={handleSearchSelect} />
+      <MapSearch 
+        onSelect={handleSearchSelect} 
+        onClear={() => onCountryClick(null, null)} 
+      />
     </div>
   );
 }

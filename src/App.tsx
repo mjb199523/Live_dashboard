@@ -6,14 +6,14 @@ import { MapView } from './components/MapView';
 import { LayerPanel } from './components/LayerPanel';
 import { MapLegend } from './components/MapLegend';
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
-import { CountryDetailPanel } from './components/CountryDetailPanel';
 import { PanelsGrid } from './components/PanelsGrid';
 import { useWorkspaceStore } from './store/workspace';
 
 export default function App() {
   const [bannerVisible, setBannerVisible] = useState(true);
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace);
+  const selectedCountryCode = useWorkspaceStore((s) => s.selectedCountryCode);
+  const setSelectedCountry = useWorkspaceStore((s) => s.setSelectedCountry);
 
   return (
     <>
@@ -34,7 +34,7 @@ export default function App() {
 
       <div className="main-layout">
         <div className="map-container">
-          <MapView onCountryClick={setSelectedCountry} />
+          <MapView onCountryClick={(code, name) => setSelectedCountry(code, name)} />
           <LayerPanel />
           <MapLegend />
         </div>
@@ -43,11 +43,6 @@ export default function App() {
       </div>
 
       <WorkspaceSwitcher />
-
-      <CountryDetailPanel
-        countryCode={selectedCountry}
-        onClose={() => setSelectedCountry(null)}
-      />
     </>
   );
 }

@@ -7,10 +7,11 @@ export interface CountryResult {
 }
 
 interface MapSearchProps {
-  onSelect: (center: [number, number]) => void;
+  onSelect: (center: [number, number], id?: string, name?: string) => void;
+  onClear?: () => void;
 }
 
-export function MapSearch({ onSelect }: MapSearchProps) {
+export function MapSearch({ onSelect, onClear }: MapSearchProps) {
   const [query, setQuery] = useState('');
   const [countries, setCountries] = useState<CountryResult[]>([]);
   const [suggestions, setSuggestions] = useState<CountryResult[]>([]);
@@ -58,7 +59,11 @@ export function MapSearch({ onSelect }: MapSearchProps) {
           onFocus={() => { if (query) setIsOpen(true); }}
         />
         {query && (
-          <button className="map-search__clear" onClick={() => { setQuery(''); setSuggestions([]); }}>
+          <button className="map-search__clear" onClick={() => { 
+            setQuery(''); 
+            setSuggestions([]); 
+            if (onClear) onClear(); 
+          }}>
             ✕
           </button>
         )}
@@ -71,7 +76,7 @@ export function MapSearch({ onSelect }: MapSearchProps) {
               key={c.id}
               className="map-search__item"
               onClick={() => {
-                onSelect(c.center);
+                onSelect(c.center, c.id, c.name);
                 setQuery(c.name);
                 setIsOpen(false);
               }}
