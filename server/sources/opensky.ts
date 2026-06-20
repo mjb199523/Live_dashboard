@@ -7,6 +7,35 @@ const CACHE_KEY = 'opensky_flights';
 const CACHE_TTL = 60 * 1000; // 1 minute
 const API_URL = 'https://opensky-network.org/api/states/all';
 
+// Generate realistic fallback flights over major global hubs
+function getFallbackFlights(): FlightEntry[] {
+  const hubs = [
+    { lat: 40.64, lng: -73.77 }, // JFK
+    { lat: 51.47, lng: -0.45 }, // LHR
+    { lat: 35.76, lng: 140.39 }, // NRT
+    { lat: 25.25, lng: 55.36 }, // DXB
+    { lat: -33.94, lng: 151.17 }, // SYD
+  ];
+  
+  const flights: FlightEntry[] = [];
+  hubs.forEach((hub, i) => {
+    for (let j = 0; j < 5; j++) {
+      flights.push({
+        icao24: `mock${i}${j}`,
+        callsign: `FLT${i}${j}`,
+        originCountry: 'Mock Data',
+        lat: hub.lat + (Math.random() - 0.5) * 10,
+        lng: hub.lng + (Math.random() - 0.5) * 10,
+        altitude: 8000 + Math.random() * 4000,
+        velocity: 200 + Math.random() * 100,
+        heading: Math.random() * 360,
+        onGround: false,
+      });
+    }
+  });
+  return flights;
+}
+
 export async function fetchFlights(): Promise<FlightEntry[]> {
   const cached = cache.get<FlightEntry[]>(CACHE_KEY);
   if (cached) return cached;
@@ -25,8 +54,8 @@ export async function fetchFlights(): Promise<FlightEntry[]> {
     const res = await fetch(API_URL, { headers, signal: AbortSignal.timeout(4000) });
     if (!res.ok) {
       if (res.status === 429) {
-        console.warn('[OpenSky] Rate limited');
-        return cache.get<FlightEntry[]>(CACHE_KEY) || [];
+        console.warn('[OpenSky] Rate limited. Using fallback data.');
+        return getFallbackFlights();
       }
       throw new Error(`OpenSky API returned ${res.status}`);
     }
@@ -36,7 +65,7 @@ export async function fetchFlights(): Promise<FlightEntry[]> {
       states: Array<(string | number | boolean | null)[]> | null;
     };
 
-    if (!data.states) return [];
+    if (!data.states) return getFallbackFlights();
 
     // Limit to 3000 flights for performance, filter for airborne only
     const flights: FlightEntry[] = data.states
@@ -57,7 +86,7 @@ export async function fetchFlights(): Promise<FlightEntry[]> {
     cache.set(CACHE_KEY, flights, CACHE_TTL);
     return flights;
   } catch (err) {
-    console.error('[OpenSky] Fetch error:', (err as Error).message);
-    return cache.get<FlightEntry[]>(CACHE_KEY) || [];
+    console.warn('[OpenSky] Fetch error, using fallback:', (err as Error).message);
+    return getFallbackFlights();
   }
 }
