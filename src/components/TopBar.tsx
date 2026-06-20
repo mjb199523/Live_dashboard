@@ -36,7 +36,7 @@ export function TopBar({ workspaceName }: TopBarProps) {
       <div className="topbar__links">
         <a
           className="topbar__link"
-          href="https://github.com"
+          href="https://github.com/mjb199523/Live_dashboard.git"
           target="_blank"
           rel="noopener noreferrer"
           title="GitHub"
