@@ -32,6 +32,7 @@ export async function fetchDisasters(): Promise<NormalizedEvent[]> {
     const fromDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const res = await fetch(`${API_URL}${fromDate}`, {
       headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) throw new Error(`GDACS API returned ${res.status}`);
 

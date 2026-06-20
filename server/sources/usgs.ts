@@ -19,7 +19,7 @@ export async function fetchEarthquakes(): Promise<NormalizedEvent[]> {
   if (cached) return cached;
 
   try {
-    const res = await fetch(FEED_URL);
+    const res = await fetch(FEED_URL, { signal: AbortSignal.timeout(4000) });
     if (!res.ok) throw new Error(`USGS API returned ${res.status}`);
 
     const geojson = await res.json() as {

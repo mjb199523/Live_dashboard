@@ -12,7 +12,9 @@ export async function fetchFlights(): Promise<FlightEntry[]> {
   if (cached) return cached;
 
   try {
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    };
     const username = process.env.OPENSKY_USERNAME;
     const password = process.env.OPENSKY_PASSWORD;
 
@@ -20,7 +22,7 @@ export async function fetchFlights(): Promise<FlightEntry[]> {
       headers['Authorization'] = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
     }
 
-    const res = await fetch(API_URL, { headers, signal: AbortSignal.timeout(15000) });
+    const res = await fetch(API_URL, { headers, signal: AbortSignal.timeout(4000) });
     if (!res.ok) {
       if (res.status === 429) {
         console.warn('[OpenSky] Rate limited');

@@ -11,7 +11,12 @@ export interface ConflictEvent {
   severity: 'high' | 'medium' | 'low';
 }
 
-const parser = new Parser();
+const parser = new Parser({
+  timeout: 4000,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  }
+});
 const RELIEFWEB_RSS = 'https://reliefweb.int/updates/rss.xml';
 
 // A simple dictionary to map countries found in titles to approximate coordinates for map placement
