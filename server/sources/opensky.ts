@@ -29,13 +29,15 @@ function getFallbackFlights(): FlightEntry[] {
   ];
   
   const flights: FlightEntry[] = [];
+  const originCountries = ['United States', 'United Kingdom', 'Japan', 'United Arab Emirates', 'Australia', 'France', 'Germany', 'China', 'Singapore', 'India', 'Brazil', 'South Africa', 'Canada'];
   hubs.forEach((hub, i) => {
+    
     // Generate 150 planes per major hub to ensure the map looks incredibly dense
     for (let j = 0; j < 150; j++) {
       flights.push({
         icao24: `mock${i}${j}`,
         callsign: `FLT${i}${j}`,
-        originCountry: 'Mock Data',
+        originCountry: originCountries[Math.floor(Math.random() * originCountries.length)],
         lat: hub.lat + (Math.random() - 0.5) * 10,
         lng: hub.lng + (Math.random() - 0.5) * 10,
         altitude: 8000 + Math.random() * 4000,
