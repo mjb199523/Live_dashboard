@@ -27,7 +27,7 @@ export async function fetchCommodities(): Promise<CommodityPrice[]> {
 
     for (const item of SYMBOLS) {
       try {
-        const quote = await yahooFinance.quote(item.symbol);
+        const quote = (await yahooFinance.quote(item.symbol)) as any;
         const price = quote.regularMarketPrice || 0;
         const changePercent = quote.regularMarketChangePercent || 0;
         
