@@ -2,11 +2,7 @@
 
 import { useClock } from '../hooks/useClock';
 
-interface TopBarProps {
-  workspaceName: string;
-}
-
-export function TopBar({ workspaceName }: TopBarProps) {
+export function TopBar() {
   const clock = useClock();
 
   return (
@@ -26,10 +22,6 @@ export function TopBar({ workspaceName }: TopBarProps) {
         <div className="topbar__live-dot" />
         LIVE
       </div>
-
-      <div className="topbar__separator" />
-
-      <div className="topbar__workspace-name">{workspaceName}</div>
 
       <div className="topbar__spacer" />
 

@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <>
-      <TopBar workspaceName={activeWorkspace.name} />
+      <TopBar />
 
       <div className="main-layout">
         <div className="map-container">
