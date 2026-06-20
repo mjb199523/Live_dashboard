@@ -15,11 +15,23 @@ function getFallbackFlights(): FlightEntry[] {
     { lat: 35.76, lng: 140.39 }, // NRT
     { lat: 25.25, lng: 55.36 }, // DXB
     { lat: -33.94, lng: 151.17 }, // SYD
+    { lat: 48.00, lng: 2.55 }, // CDG
+    { lat: 50.03, lng: 8.57 }, // FRA
+    { lat: 39.85, lng: 116.28 }, // PEK
+    { lat: 1.36, lng: 103.99 }, // SIN
+    { lat: 33.94, lng: -118.40 }, // LAX
+    { lat: 41.97, lng: -87.90 }, // ORD
+    { lat: 28.55, lng: 77.10 }, // DEL
+    { lat: -23.43, lng: -46.47 }, // GRU
+    { lat: -26.13, lng: 28.24 }, // JNB
+    { lat: 37.61, lng: -122.38 }, // SFO
+    { lat: 22.30, lng: 113.91 }, // HKG
   ];
   
   const flights: FlightEntry[] = [];
   hubs.forEach((hub, i) => {
-    for (let j = 0; j < 5; j++) {
+    // Generate 150 planes per major hub to ensure the map looks incredibly dense
+    for (let j = 0; j < 150; j++) {
       flights.push({
         icao24: `mock${i}${j}`,
         callsign: `FLT${i}${j}`,
