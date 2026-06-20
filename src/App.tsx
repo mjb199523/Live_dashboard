@@ -5,7 +5,6 @@ import { TopBar } from './components/TopBar';
 import { MapView } from './components/MapView';
 import { LayerPanel } from './components/LayerPanel';
 import { MapLegend } from './components/MapLegend';
-import { WorkspaceSwitcher } from './components/WorkspaceSwitcher';
 import { PanelsGrid } from './components/PanelsGrid';
 import { useWorkspaceStore } from './store/workspace';
 
@@ -27,8 +26,6 @@ export default function App() {
 
         <PanelsGrid enabledPanels={activeWorkspace.enabledPanels} />
       </div>
-
-      <WorkspaceSwitcher />
     </>
   );
 }
