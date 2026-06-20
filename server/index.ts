@@ -123,11 +123,15 @@ app.get('/api/commodities', async (_req, res) => {
 
 
 // ─── Start Server ─────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n  ┌─────────────────────────────────────────┐`);
-  console.log(`  │  Dashboard API Server                    │`);
-  console.log(`  │  http://localhost:${PORT}                  │`);
-  console.log(`  │  Health: http://localhost:${PORT}/api/health│`);
-  console.log(`  └─────────────────────────────────────────┘\n`);
-  startCronJobs();
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n  ┌─────────────────────────────────────────┐`);
+    console.log(`  │  Dashboard API Server                    │`);
+    console.log(`  │  http://localhost:${PORT}                  │`);
+    console.log(`  │  Health: http://localhost:${PORT}/api/health│`);
+    console.log(`  └─────────────────────────────────────────┘\n`);
+    startCronJobs();
+  });
+}
+
+export default app;
